@@ -27,10 +27,14 @@ static void log_debug_output(LOGLIB_LOGGER* logger, const char* msg) {
 }
 
 
+#ifndef NDEBUG
 LOGLIB_LOGGER LOGLIB_debug_output_logger = { log_debug_output, ~(uint64_t)(0), NULL };
-
-
+#else
+LOGLIB_LOGGER LOGLIB_debug_output_logger = { log_debug_output, 0, NULL };
 #endif
+
+
+#endif //_WIN32
 
 
 //log in stdout
@@ -64,7 +68,11 @@ static void get_datetime_str(char* buffer, int size) {
 
 
 //standard loggers
+#if defined(NDEBUG) || !defined(_WIN32)
 LOGLIB_LOGGER LOGLIB_stdout_logger = { log_stdout, ~(uint64_t)(0), NULL };
+#else
+LOGLIB_LOGGER LOGLIB_stdout_logger = { log_stdout, 0, NULL };
+#endif
 LOGLIB_LOGGER LOGLIB_stderr_logger = { log_stderr,            (0), NULL };
 LOGLIB_LOGGER LOGLIB_file_logger   = { log_file  , ~(uint64_t)(0), NULL };
 

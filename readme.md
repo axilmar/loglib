@@ -18,8 +18,8 @@ int main() {
 
 ## Standard loggers
 
-- LOGLIB_debug_output_logger: only in Windows, it logs a message into Visual Studio output; activated by default.
-- LOGLIB_stdout_logger; prints a message in the console; activated by default.
+- LOGLIB_debug_output_logger: only in Windows, it logs a message into Visual Studio output; activated by default in debug mode on Windows only, otherwise not active.
+- LOGLIB_stdout_logger; prints a message in the console; activated by default on non-Windows platforms/in release mode in Windows, otherwise not active by default.
 - LOGLIB_stderr_logger; prints a message in standard error; not active by default.
 - LOGLIB_file_logger; prints a message into a file; not active by default.
 

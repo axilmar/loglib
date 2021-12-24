@@ -28,13 +28,12 @@ int main() {
 The logger's `LOGLIB_file_logger`data member must be set to a FILE*. Example:
 
 ```c
-FILE* file = fopen("log.txt");
-LOGLIB_file_logger.data = file;
+LOGLIB_file_logger.data = fopen("log.txt");
 ```
 
 ## Customizing individual loggers
 
-Each logger has its own log flags. Setting those individually allows customizing the behavior of its logger. For example, in order to print errors in stderr and all others in stdout:
+Each logger has its own log flags. Setting those individually allows customizing the behavior of each logger. For example, in order to print errors in stderr and all others in stdout:
 
 ```c
 LOGLIB_stdout_logger.flags = LOGLIB_LOG_INFORMATION | LOBLIG_LOG_WARNING;

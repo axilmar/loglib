@@ -100,3 +100,6 @@ int main() {
 }
 ```
 
+## Disabling the logger at compile time
+
+If `LOGLIB_DISABLED` is defined, then all logging code is removed and the logging functions do nothing.

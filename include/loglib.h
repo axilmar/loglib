@@ -12,6 +12,14 @@ extern "C" {
 
 
 /**
+ * Buffer size for messages. 
+ */
+#ifndef LOGLIB_BUFFER_SIZE
+#define LOGLIB_BUFFER_SIZE 4095
+#endif
+
+
+/**
  * log flags. 
  */
 enum LOGLIB_LOG_FLAGS {

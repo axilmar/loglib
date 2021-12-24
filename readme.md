@@ -103,3 +103,7 @@ int main() {
 ## Disabling the logger at compile time
 
 If `LOGLIB_DISABLED` is defined, then all logging code is removed and the logging functions do nothing.
+
+## Specifying the buffer size at compile time
+
+The preprocessor macro `LOGLIB_BUFFER_SIZE` can be used to set the buffer size at compile time. By default, it allows for 4095 characters (the last character is reserved for '\0'). 

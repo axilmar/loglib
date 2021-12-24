@@ -57,13 +57,47 @@ static log_file(LOGLIB_LOGGER* logger, const char* msg) {
 }
 
 
+//output
+typedef struct OUTPUT_DATA {
+    char buf[LOGLIB_BUFFER_SIZE + 1];
+    char* out;
+    int len;
+} OUTPUT_DATA;
+
+
+//init output data
+static void init_output_data(OUTPUT_DATA* data) {
+    data->out = data->buf;
+    data->len = sizeof(data->buf) - 1;
+    data->buf[sizeof(data->buf) - 1] = '\0';
+}
+
+
+//Adds text to the given buffer
+static void strout_va(OUTPUT_DATA* data, const char* format, va_list args) {
+    int written = vsnprintf(data->out, data->len, format, args);
+    data->out += written;
+    data->len -= written;
+}
+
+
+//Adds text to the given buffer
+static void strout(OUTPUT_DATA* data, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    strout_va(data, format, args);
+    va_end(args);
+}
+
 
 //get datetime string
-static void get_datetime_str(char* buffer, int size) {
+static void get_datetime_str(OUTPUT_DATA* data) {
     time_t timeval = time(NULL);
     struct tm tms;
     localtime_s(&tms, &timeval);
-    strftime(buffer, size, "%Y-%m-%e %H:%M:%S", &tms);
+    int written = (int)strftime(data->out, data->len, "%Y-%m-%e %H:%M:%S", &tms);
+    data->out += written;
+    data->len -= written;
 }
 
 
@@ -156,23 +190,36 @@ void LOGLIB_remove_logger(LOGLIB_LOGGER* logger) {
 //Logs a message.
 void LOGLIB_log_va(uint64_t type, const char* type_name, const char* format, va_list args) {
     #ifndef LOGLIB_DISABLED
-    //create the date & time string
-    char datetime_buf[256];
-    get_datetime_str(datetime_buf, sizeof(datetime_buf));
+    OUTPUT_DATA data;
+    init_output_data(&data);
 
-    //create the message
-    char msg_buf[4096];
-    vsnprintf(msg_buf, sizeof(msg_buf), format, args);
+    //add the date & time string
+    strout(&data, "[");
+    get_datetime_str(&data);
+    strout(&data, "] ");
 
-    //create the whole message
-    char final_buf[256 + 4096 + 32];
-    snprintf(final_buf, sizeof(final_buf), "[%s] [%s] %s\n", datetime_buf, type_name, msg_buf);
+    //add the type name
+    strout(&data, "[");
+    strout(&data, type_name);
+    strout(&data, "] ");
+
+    //add the message
+    strout_va(&data, format, args);
+
+    //add the newline character
+    if (data.out < data.buf + sizeof(data.buf) - 2) {
+        *data.out = '\n';
+        *(data.out + 1) = '\0';
+    }
+    else {
+        data.buf[sizeof(data.buf) - 2] = '\n';
+    }
 
     //log the message
     for (size_t i = 0; i < logger_table_size; ++i) {
         LOGGER_PTR logger = logger_table[i];
         if (logger->flags & type) {
-            logger->log(logger, final_buf);
+            logger->log(logger, data.buf);
         }
     }
     #endif
